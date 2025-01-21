@@ -1,4 +1,4 @@
-import com.github.javafaker.Faker;
+import base.BaseTest;
 import courier.CourierSteps;
 import courier.CreateCourier;
 import courier.LoginCourier;
@@ -9,8 +9,8 @@ import org.junit.After;
 import org.junit.Test;
 
 
-public class CourierCreateTest extends CourierSteps {
-        Faker faker = new Faker();
+public class CourierCreateTest extends BaseTest {
+        CourierSteps courierSteps = new CourierSteps();
         String login = faker.name().username();
         String password = faker.internet().password();
         String firstName = faker.name().firstName();
@@ -21,8 +21,8 @@ public class CourierCreateTest extends CourierSteps {
         @Description("Проверка, что можно создать курьера с валидными данными")
         public void testCreateCourierWithValidData() {
                 CreateCourier courierCreate = new CreateCourier(login, password, firstName);
-                Response response = getRequestForCreatingCourier(courierCreate);
-                checkResponseAfterCreatingCourier(response);
+                Response response = courierSteps.getRequestForCreatingCourier(courierCreate);
+                courierSteps.checkResponseAfterCreatingCourier(response);
         }
 
         @Test
@@ -30,8 +30,8 @@ public class CourierCreateTest extends CourierSteps {
         @Description("Проверка, что невозможно создать курьера с пустым полем 'login'")
         public void testCreateCourierWithEmptyLogin() {
                 CreateCourier courierCreate = new CreateCourier("", password, firstName);
-                Response response = getRequestForCreatingCourier(courierCreate);
-                checkResponseAfterCreatingCourierWithoutLoginOrPassword(response);
+                Response response = courierSteps.getRequestForCreatingCourier(courierCreate);
+                courierSteps.checkResponseAfterCreatingCourierWithoutLoginOrPassword(response);
         }
 
         @Test
@@ -39,8 +39,8 @@ public class CourierCreateTest extends CourierSteps {
         @Description("Проверка, что невозможно создать курьера с пустым полем 'password'")
         public void testCreateCourierWithEmptyPassword() {
                 CreateCourier courierCreate = new CreateCourier(login, "", firstName);
-                Response response = getRequestForCreatingCourier(courierCreate);
-                checkResponseAfterCreatingCourierWithoutLoginOrPassword(response);
+                Response response = courierSteps.getRequestForCreatingCourier(courierCreate);
+                courierSteps.checkResponseAfterCreatingCourierWithoutLoginOrPassword(response);
         }
 
         @Test
@@ -48,20 +48,20 @@ public class CourierCreateTest extends CourierSteps {
         @Description("Проверка, что невозможно создать двух курьеров с повторяющимися логинами")
         public void testCreateDuplicateCouriers() {
                 CreateCourier courierCreate = new CreateCourier(login, password, firstName);
-                Response responseFirst = getRequestForCreatingCourier(courierCreate);
-                checkResponseAfterCreatingCourier(responseFirst);
-                Response responseSecond = getRequestForCreatingCourier(courierCreate);
-                checkResponseAfterCreatingCourierWithDuplicatedLogin(responseSecond);
+                Response responseFirst = courierSteps.getRequestForCreatingCourier(courierCreate);
+                courierSteps.checkResponseAfterCreatingCourier(responseFirst);
+                Response responseSecond = courierSteps.getRequestForCreatingCourier(courierCreate);
+                courierSteps.checkResponseAfterCreatingCourierWithDuplicatedLogin(responseSecond);
         }
 
         @After
         public void cleanData() {
                 LoginCourier courierLogin = new LoginCourier(login, password);
-                Response response = getRequestToAuthorizeCourier(courierLogin);
+                Response response = courierSteps.getRequestToAuthorizeCourier(courierLogin);
                 int status = response.then().extract().statusCode();
                 if (status == 200) {
                         String courierId = response.then().extract().body().path("id").toString();
-                        deleteCourier(courierId);
+                        courierSteps.deleteCourier(courierId);
                 }
         }
 }

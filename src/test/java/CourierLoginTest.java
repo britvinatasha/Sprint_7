@@ -1,4 +1,4 @@
-import com.github.javafaker.Faker;
+import base.BaseTest;
 import courier.CourierSteps;
 import courier.CreateCourier;
 import courier.LoginCourier;
@@ -8,8 +8,8 @@ import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Test;
 
-public class CourierLoginTest extends CourierSteps {
-    Faker faker = new Faker();
+public class CourierLoginTest extends BaseTest {
+    CourierSteps courierSteps = new CourierSteps();
     String login = faker.name().username();
     String password = faker.internet().password();
     String firstName = faker.name().firstName();
@@ -20,9 +20,9 @@ public class CourierLoginTest extends CourierSteps {
     public void testLoginCourierWithValidData() {
         CreateCourier courierCreate = new CreateCourier(login, password, firstName);
         LoginCourier courierLogin = new LoginCourier(login, password);
-        getRequestForCreatingCourier(courierCreate);
-        Response response = getRequestToAuthorizeCourier(courierLogin);
-        checkResponseAfterCourierAuthorized(response);
+        courierSteps.getRequestForCreatingCourier(courierCreate);
+        Response response = courierSteps.getRequestToAuthorizeCourier(courierLogin);
+        courierSteps.checkResponseAfterCourierAuthorized(response);
     }
 
     @Test
@@ -31,9 +31,9 @@ public class CourierLoginTest extends CourierSteps {
     public void testLoginCourierWithoutLogin() {
         CreateCourier courierCreate = new CreateCourier(login, password, firstName);
         LoginCourier courierLogin = new LoginCourier("", password);
-        getRequestForCreatingCourier(courierCreate);
-        Response response = getRequestToAuthorizeCourier(courierLogin);
-        checkResponseAfterAuthorizationCourierWithoutLoginOrPassword(response);
+        courierSteps.getRequestForCreatingCourier(courierCreate);
+        Response response = courierSteps.getRequestToAuthorizeCourier(courierLogin);
+        courierSteps.checkResponseAfterAuthorizationCourierWithoutLoginOrPassword(response);
     }
 
     @Test
@@ -42,9 +42,9 @@ public class CourierLoginTest extends CourierSteps {
     public void testLoginCourierWithoutPassword() {
         CreateCourier courierCreate = new CreateCourier(login, password, firstName);
         LoginCourier courierLogin = new LoginCourier(login,"");
-        getRequestForCreatingCourier(courierCreate);
-        Response response = getRequestToAuthorizeCourier(courierLogin);
-        checkResponseAfterAuthorizationCourierWithoutLoginOrPassword(response);
+        courierSteps.getRequestForCreatingCourier(courierCreate);
+        Response response = courierSteps.getRequestToAuthorizeCourier(courierLogin);
+        courierSteps.checkResponseAfterAuthorizationCourierWithoutLoginOrPassword(response);
     }
 
     @Test
@@ -53,9 +53,9 @@ public class CourierLoginTest extends CourierSteps {
     public void testLoginCourierWithWrongLogin() {
         CreateCourier courierCreate = new CreateCourier(login, password, firstName);
         LoginCourier courierLogin = new LoginCourier(login + "qwerty" ,password);
-        getRequestForCreatingCourier(courierCreate);
-        Response response = getRequestToAuthorizeCourier(courierLogin);
-        checkResponseAfterAuthorizationCourierWithWrongLoginOrPassword(response);
+        courierSteps.getRequestForCreatingCourier(courierCreate);
+        Response response = courierSteps.getRequestToAuthorizeCourier(courierLogin);
+        courierSteps.checkResponseAfterAuthorizationCourierWithWrongLoginOrPassword(response);
     }
 
     @Test
@@ -64,19 +64,19 @@ public class CourierLoginTest extends CourierSteps {
     public void testLoginCourierWithWrongPassword() {
         CreateCourier courierCreate = new CreateCourier(login, password, firstName);
         LoginCourier courierLogin = new LoginCourier(login,password +"qwerty");
-        getRequestForCreatingCourier(courierCreate);
-        Response response = getRequestToAuthorizeCourier(courierLogin);
-        checkResponseAfterAuthorizationCourierWithWrongLoginOrPassword(response);
+        courierSteps.getRequestForCreatingCourier(courierCreate);
+        Response response = courierSteps.getRequestToAuthorizeCourier(courierLogin);
+        courierSteps.checkResponseAfterAuthorizationCourierWithWrongLoginOrPassword(response);
     }
 
     @After
     public void cleanData() {
         LoginCourier courierLogin = new LoginCourier(login, password);
-        Response response = getRequestToAuthorizeCourier(courierLogin);
+        Response response = courierSteps.getRequestToAuthorizeCourier(courierLogin);
         int status = response.then().extract().statusCode();
         if (status == 200) {
             String courierId = response.then().extract().body().path("id").toString();
-            deleteCourier(courierId);
+            courierSteps.deleteCourier(courierId);
         }
     }
 }

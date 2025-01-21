@@ -1,4 +1,4 @@
-import com.github.javafaker.Faker;
+import base.BaseTest;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
@@ -10,8 +10,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class CreateOrderTest extends OrderSteps {
-    Faker faker = new Faker();
+public class CreateOrderTest extends BaseTest {
+    OrderSteps orderSteps = new OrderSteps();
     String firstName = faker.name().firstName();
     String lastName = faker.name().lastName();
     String address = faker.address().fullAddress();
@@ -44,14 +44,14 @@ public class CreateOrderTest extends OrderSteps {
     @Description("Создание заказа самоката любого цвета")
     public void checkDifferentColoursForOrder() {
         CreateOrder createOrder = new CreateOrder(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, colour);
-        Response response = getRequestForCreatingOrder(createOrder);
-        trackId = checkResponseAfterCreatingOrder(response);
+        Response response = orderSteps.getRequestForCreatingOrder(createOrder);
+        trackId = orderSteps.checkResponseAfterCreatingOrder(response);
     }
 
     @After
     public void cleanData() {
         if (trackId != null) {
-            cancelOrder(trackId);
+            orderSteps.cancelOrder(trackId);
         }
     }
 }
